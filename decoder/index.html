@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>f8 decoder</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div id="description">
+        <h1>f8</h1>
+        <p>Exponent: 3b <br>Exponent bias: 3<br> Mantissa: 4b</p>
+    </div>
+    <div class="panel">
+        <div class="boxes">
+            <span class="sgn"><input type="checkbox" id="sgn0"></span>
+            <span class="exp">
+                <input type="checkbox" id="exp2">
+                <input type="checkbox" id="exp1">
+                <input type="checkbox" id="exp0">
+            </span>
+            <span class="man">
+                <input type="checkbox" id="man1">
+                <input type="checkbox" id="man2">
+                <input type="checkbox" id="man3">
+                <input type="checkbox" id="man4">
+            </span>
+        </div>
+        <p id="value">Value: 0</p>
+    </div>
+
+    <script type="text/javascript" src="script.js"></script>
+</body>
+
+</html>

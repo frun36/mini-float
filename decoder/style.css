@@ -1,0 +1,29 @@
+h1 {
+    font-family: "Roboto";
+}
+
+p {
+    font-family: "Roboto";
+}
+
+.sgn {
+    background-color: orange;
+}
+
+.exp {
+    background-color: red;
+}
+
+.man {
+    background-color: green;
+}
+
+.boxes {
+    display: flex;
+}
+
+.panel {
+    display: flex;
+    flex-direction: column;
+    font-family: "Roboto";
+}

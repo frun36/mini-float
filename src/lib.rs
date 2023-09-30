@@ -74,11 +74,34 @@ impl From<f8> for f32 {
         // Setting significand
         result |= man << (F32_MAN_LEN - F8_MAN_LEN);
 
-        let u = Conv32 { bits: result };
+        let conv = Conv32 { bits: result };
         unsafe {
-            // println!("{:#034b} {}", u.bits, u.value);
-            u.value
+            // println!("{:#034b} {}", conv.bits, conv.value);
+            conv.value
         }
+    }
+}
+
+impl From<f32> for f8 {
+    fn from(x: f32) -> Self {
+        let result: u8 = 0;
+        let conv = Conv32 { value: x };
+
+        let bits = unsafe {
+            conv.bits
+        };
+
+        let sgn: u8 = todo!();
+        let exp: u8 = todo!();
+        let man: u8 = todo!();
+
+        if exp > 7 {
+            return f8::new_from_byte(0b10000000);
+        }
+
+        result |= sgn << 7;
+
+        f8::new_from_byte(result)
     }
 }
 
