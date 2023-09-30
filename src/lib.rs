@@ -1,5 +1,7 @@
 #![no_std]
 
+mod tests;
+
 #[allow(dead_code)]
 const F32_EXP_LEN: u8 = 8;
 const F32_EXP_BIAS: u8 = 127;
@@ -15,8 +17,13 @@ pub struct f8(u8);
 
 impl f8 {
     #[inline]
-    pub fn new_from_byte(byte: u8) -> Self {
+    pub fn from_byte(byte: u8) -> Self {
         Self(byte)
+    }
+
+    #[inline]
+    pub fn from_f32(x: f32) -> Self {
+        Self::from(x)
     }
 
     #[inline]
@@ -84,49 +91,27 @@ impl From<f8> for f32 {
 
 impl From<f32> for f8 {
     fn from(x: f32) -> Self {
-        let result: u8 = 0;
+        let mut result: u8 = 0;
         let conv = Conv32 { value: x };
 
         let bits = unsafe {
             conv.bits
         };
 
-        let sgn: u8 = todo!();
-        let exp: u8 = todo!();
-        let man: u8 = todo!();
+        let sgn: u8 = (bits >> 31) as u8 & 1_u8;
+        let exp: u8 = ((bits >> F32_MAN_LEN) & ((1 << F32_EXP_LEN) - 1)) as u8;
+        let man: u8 = ((bits >> (F32_MAN_LEN-F8_MAN_LEN)) & ((1 << F8_MAN_LEN) - 1)) as u8;
 
-        if exp > 7 {
-            return f8::new_from_byte(0b10000000);
+        if !(F32_EXP_BIAS - F8_EXP_LEN..=7 + F32_EXP_BIAS - F8_EXP_LEN).contains(&exp){
+            return f8::from_byte(0b10000000);
         }
 
+        let exp = exp + F8_EXP_BIAS - F32_EXP_BIAS;
+
         result |= sgn << 7;
+        result |= exp << F8_MAN_LEN;
+        result |= man;
 
-        f8::new_from_byte(result)
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test() {
-        let f = f8::new_from_byte(0b01111111);
-        assert_eq!(31.0_f32, f32::from(f));
-
-        let f = f8::new_from_byte(0b11111111);
-        assert_eq!(-31.0_f32, f32::from(f));
-
-        let f = f8::new_from_byte(0b00111111);
-        assert_eq!(1.9375_f32, f32::from(f));
-
-        let f = f8::new_from_byte(0b10111111);
-        assert_eq!(-1.9375_f32, f32::from(f));
-
-        let f = f8::new_from_byte(0b00000000);
-        assert_eq!(0_f32, f32::from(f));
-
-        let f = f8::new_from_byte(0b10000000);
-        assert_eq!(0_f32, f32::from(f));
+        f8::from_byte(result)
     }
 }
