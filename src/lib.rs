@@ -28,17 +28,17 @@ impl f8 {
 
     #[inline]
     fn get_sgn(&self) -> u8 {
-        (self.0 >> 7) & 1_u8
+        (self.0 >> 7) & 0x01_u8
     }
 
     #[inline]
     fn get_exp(&self) -> u8 {
-        (self.0 >> 4) & ((1_u8 << F8_EXP_LEN) - 1)
+        (self.0 >> 4) & ((0x01_u8 << F8_EXP_LEN) - 1)
     }
 
     #[inline]
     fn get_man(&self) -> u8 {
-        self.0 & ((1_u8 << F8_MAN_LEN) - 1)
+        self.0 & ((0x01_u8 << F8_MAN_LEN) - 1)
     }
 
     pub fn as_byte(&self) -> u8 {
@@ -57,10 +57,10 @@ union Conv32 {
 
 impl From<f8> for f32 {
     fn from(x: f8) -> Self {
-        if x.0 == 0 {
+        if x.0 == 0x00 {
             return 0.;
         }
-        if x.0 == 128 {
+        if x.0 == 0x80 {
             return -0.;
         }
 
@@ -98,12 +98,12 @@ impl From<f32> for f8 {
             conv.bits
         };
 
-        let sgn: u8 = (bits >> 31) as u8 & 1_u8;
+        let sgn: u8 = (bits >> 31) as u8 & 0x01_u8;
         let exp: u8 = ((bits >> F32_MAN_LEN) & ((1 << F32_EXP_LEN) - 1)) as u8;
         let man: u8 = ((bits >> (F32_MAN_LEN-F8_MAN_LEN)) & ((1 << F8_MAN_LEN) - 1)) as u8;
 
         if !(F32_EXP_BIAS - F8_EXP_LEN..=7 + F32_EXP_BIAS - F8_EXP_LEN).contains(&exp){
-            return f8::from_byte(0b10000000);
+            return f8::from_byte(0x80);
         }
 
         let exp = exp + F8_EXP_BIAS - F32_EXP_BIAS;
